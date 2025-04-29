@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Grindify AI - Personalized Supplement Stacks for Your Goals">
+  <meta name="keywords" content="supplements, personalized stack, AI nutrition, health goals">
+  <meta name="author" content="Grindify AI">
+  <meta property="og:title" content="Grindify AI - Personalized Supplement Stacks">
+  <meta property="og:description" content="Tailored supplement plans powered by AI to help you achieve your health goals.">
+  <meta property="og:image" content="https://grindifyai.com/social-preview.jpg">
+  <meta property="og:url" content="https://grindifyai.com">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>Grindify AI - Personalized Supplement Stacks</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">  <style>
+    /* Base Styles */
+    body {
+      font-family: 'Inter', sans-serif;
+      scroll-behavior: smooth;
+    }
+
+    /* Animations */
+    @keyframes pulse {
+      0% { opacity: 0.5; }
+      50% { opacity: 1; }
+      100% { opacity: 0.5; }
+    }
+
+    /* Utility Classes */
+    .gradient-bg {
+      background: linear-gradient(135deg, #09c1ff 0%, #09c1ff 100%);
+    }
+
+    .text-gradient {
+      background: linear-gradient(135deg, #09c1ff 0%, #09c1ff 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Effects */
+    .glass-effect {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .glow-effect {
+      box-shadow: 0 0 20px rgba(9, 193, 255, 0.3);
+    }
+
+    /* Hover Animations */
+    .hover-lift {
+      transition: transform 0.3s ease;
+    }
+
+    .hover-lift:hover {
+      transform: translateY(-5px);
+    }
+
+    /* Fade In Animation */
+    [data-fade] { 
+      opacity: 0; 
+      transform: translateY(20px); 
+      transition: opacity 0.8s ease, transform 0.8s ease; 
+    }
+
+    [data-fade].visible { 
+      opacity: 1; 
+      transform: translateY(0); 
+    }
+  </style>
+</head>
+<body class="bg-black text-white antialiased">
+  <!-- Hero Section -->  <header class="min-h-screen relative overflow-hidden">
+    <!-- Animated Background -->
+    <div class="absolute inset-0 bg-black">
+      <div class="absolute inset-0" style="background: radial-gradient(circle at 50% 50%, rgba(9, 193, 255, 0.15) 0%, transparent 50%); animation: pulse 4s ease-in-out infinite;"></div>
+      <div class="absolute inset-0" style="background: radial-gradient(circle at 30% 30%, rgba(9, 193, 255, 0.1) 0%, transparent 40%); animation: pulse 4s ease-in-out infinite 1s;"></div>
+      <div class="absolute inset-0" style="background: radial-gradient(circle at 70% 70%, rgba(9, 193, 255, 0.1) 0%, transparent 40%); animation: pulse 4s ease-in-out infinite 2s;"></div>
+    </div>    <div class="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-4 pt-16 md:pt-20" data-fade>
+      <div class="flex items-center justify-center space-x-2 mb-4">
+        <span class="px-4 py-1.5 bg-[#09c1ff] bg-opacity-20 rounded-full text-[#09c1ff] text-sm font-medium">AI-Powered</span>
+        <span class="px-4 py-1.5 bg-[#09c1ff] bg-opacity-20 rounded-full text-[#09c1ff] text-sm font-medium">Personalized</span>
+      </div>
+      
+      <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+        Get Your <span class="text-gradient">Perfect Stack</span><br>
+        in <span class="text-gradient">60 Seconds</span>
+      </h1>      <div class="grid md:grid-cols-3 gap-8 max-w-3xl mx-auto mb-8">
+        <div class="glass-effect p-6 rounded-xl hover-lift">
+          <div class="text-[#09c1ff] mb-2">
+            <svg class="w-8 h-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+          </div>
+          <div class="text-sm text-gray-300">Instant AI Analysis</div>
+        </div>
+        <div class="glass-effect p-6 rounded-xl hover-lift">
+          <div class="text-[#09c1ff] mb-2">
+            <svg class="w-8 h-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+            </svg>
+          </div>
+          <div class="text-sm text-gray-300">Research-Backed Stacks</div>
+        </div>
+        <div class="glass-effect p-6 rounded-xl hover-lift">
+          <div class="text-[#09c1ff] mb-2">
+            <svg class="w-8 h-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"></path>
+            </svg>
+          </div>
+          <div class="text-sm text-gray-300">Personalized For You</div>
+        </div>
+      </div>
+
+      <p class="text-xl md:text-2xl mb-8 text-gray-300 max-w-2xl">
+        Stop guessing. Start achieving. Our AI analyzes your goals, biology, and lifestyle to create your optimal supplement stack.
+      </p>      <div class="flex flex-col md:flex-row items-center justify-center gap-4">
+        <a href="#formSection" class="px-8 py-4 bg-[#09c1ff] text-black rounded-lg font-semibold text-lg hover:bg-opacity-90 transition-all hover-lift glow-effect">
+          Join the Waitlist
+        </a>
+        <a href="#benefits" class="px-8 py-4 bg-transparent border border-[#09c1ff] text-[#09c1ff] rounded-lg font-semibold text-lg hover:bg-[#09c1ff] hover:bg-opacity-10 transition-all">
+          Learn More
+        </a>      </div>
+
+      <!-- Animated Arrow -->
+      <div class="mt-16 animate-bounce">
+        <svg class="w-6 h-6 text-[#09c1ff]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+        </svg>
+      </div>
+    </div>
+  </header><!-- Benefits Section -->
+  <section id="benefits" class="py-24 bg-black" data-fade>
+    <div class="max-w-6xl mx-auto px-4">
+      <h2 class="text-4xl font-bold text-center mb-16 text-gradient">Why Choose Grindify AI?</h2>
+      <div class="grid md:grid-cols-3 gap-12">
+        <div class="glass-effect p-8 rounded-2xl hover-lift">
+          <div class="w-16 h-16 mb-6 mx-auto bg-[#09c1ff] rounded-full flex items-center justify-center">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-4 text-center">Personalized Plans</h3>
+          <p class="text-gray-400 text-center">Advanced AI analyzes your unique profile to create the perfect supplement stack.</p>
+        </div>
+        <div class="glass-effect p-8 rounded-2xl hover-lift">
+          <div class="w-16 h-16 mb-6 mx-auto bg-[#09c1ff] rounded-full flex items-center justify-center">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-4 text-center">Science-Backed</h3>
+          <p class="text-gray-400 text-center">Every recommendation is based on peer-reviewed research and clinical studies.</p>
+        </div>
+        <div class="glass-effect p-8 rounded-2xl hover-lift">          <div class="w-16 h-16 mb-6 mx-auto bg-[#09c1ff] rounded-full flex items-center justify-center">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-4 text-center">Quick Results</h3>
+          <p class="text-gray-400 text-center">Start seeing improvements in your performance within weeks, not months.</p>
+        </div>
+      </div>
+    </div>
+  </section>  <!-- Early Access Section -->
+  <section id="formSection" class="py-24 bg-black" data-fade>
+    <div class="max-w-3xl mx-auto px-4">
+      <div class="glass-effect p-8 rounded-2xl glow-effect text-center">
+        <span class="px-3 py-1 bg-[#09c1ff] bg-opacity-20 rounded-full text-[#09c1ff] text-sm font-medium mb-4 inline-block">Coming Soon</span>
+        <h2 class="text-3xl font-bold mb-4 text-gradient">Get Early Access</h2>
+        <p class="text-xl text-gray-300 mb-8">Join our waitlist to be first in line when we launch and receive exclusive early access benefits.</p>
+        <form class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4">
+          <input type="email" name="email" required placeholder="Enter your email" 
+                 class="w-full md:w-auto p-4 bg-black border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#09c1ff] text-white">
+          <button type="submit" class="px-8 py-4 bg-gradient-to-r from-[#09c1ff] to-[#09c1ff] text-white rounded-lg font-semibold hover:opacity-90 transition-all hover-lift">
+            Join Waitlist
+          </button>
+        </form>
+        <p class="text-gray-400 mt-4 text-sm">🔒 We respect your privacy and will never share your information.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-12 bg-black text-gray-400 text-center" data-fade>
+    <div class="max-w-5xl mx-auto px-4">      <div class="flex items-center justify-center mb-6">
+        <span class="text-2xl font-bold text-[#09c1ff]">Grindify AI</span>
+      </div>
+      <p class="mb-6">Building the future of personalized nutrition with AI.</p>      <div class="flex justify-center space-x-6 mb-8">
+        <a href="https://x.com/grindifyai" target="_blank" rel="noopener" class="hover:text-[#09c1ff] transition-colors" aria-label="X (formerly Twitter)">
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+          </svg>
+        </a>
+        <a href="https://www.linkedin.com/company/grindifyai" target="_blank" rel="noopener" class="hover:text-[#09c1ff] transition-colors" aria-label="LinkedIn">
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        </a>
+        <a href="https://www.instagram.com/GrindifyArchive/" target="_blank" rel="noopener" class="hover:text-[#09c1ff] transition-colors" aria-label="Instagram">
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+          </svg>
+        </a>
+        <a href="https://www.youtube.com/@GrindifyArchive" target="_blank" rel="noopener" class="hover:text-[#09c1ff] transition-colors" aria-label="YouTube">
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+          </svg>
+        </a>
+        <a href="https://www.tiktok.com/@grindify.archive" target="_blank" rel="noopener" class="hover:text-[#09c1ff] transition-colors" aria-label="TikTok">
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>
+          </svg>
+        </a>
+        <a href="https://github.com/grindifyai" target="_blank" rel="noopener" class="hover:text-[#09c1ff] transition-colors" aria-label="GitHub">
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+        </a>
+      </div>
+      <div class="border-t border-gray-800 pt-8">
+        <p>&copy; 2024-2025 Grindify AI. All rights reserved.</p>
+        <p class="mt-2">
+          <a href="mailto:support@grindifyai.com" class="hover:text-[#09c1ff] transition-colors">Contact</a>
+          <span class="mx-2">|</span>
+          <a href="/privacy" class="hover:text-[#09c1ff] transition-colors">Privacy</a>
+          <span class="mx-2">|</span>
+          <a href="/terms" class="hover:text-[#09c1ff] transition-colors">Terms</a>
+        </p>
+      </div>
+    </div>
+  </footer>
+  <script>
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+          behavior: 'smooth'
+        });
+      });
+    });
+
+    // IntersectionObserver for fade-in
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) e.target.classList.add('visible');
+      });
+    }, { threshold: 0.2 });
+    document.querySelectorAll('[data-fade]').forEach(el => observer.observe(el));    // Handle form submission
+    document.querySelector('#formSection form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const form = e.target;
+      const emailInput = form.email;
+      const email = emailInput.value.trim();
+
+      // Simple email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        emailInput.classList.add('border-red-500');
+        const errorMsg = document.createElement('p');
+        errorMsg.className = 'text-red-500 text-sm mt-2';
+        errorMsg.textContent = 'Please enter a valid email address';
+        emailInput.parentNode.appendChild(errorMsg);
+        setTimeout(() => {
+          emailInput.classList.remove('border-red-500');
+          errorMsg.remove();
+        }, 3000);
+        return;
+      }
+
+      // Add loading state
+      const button = form.querySelector('button');
+      const originalText = button.innerText;
+      button.disabled = true;
+      button.innerHTML = '<span class="inline-flex items-center"><svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Joining...</span>';      try {
+        const response = await fetch('/.netlify/functions/subscribe', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email })
+        });
+
+        if (!response.ok) {
+          throw new Error('Subscription failed');
+        }
+
+        // Show success message
+        const successMsg = document.createElement('div');
+        successMsg.className = 'text-[#09c1ff] mt-4 flex items-center justify-center space-x-2';
+        successMsg.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><span>Thank you for joining our waitlist!</span>';
+        form.replaceWith(successMsg);
+      } catch (error) {
+        const errorMsg = document.createElement('p');
+        errorMsg.className = 'text-red-500 text-sm mt-2';
+        errorMsg.textContent = 'Something went wrong. Please try again.';
+        form.appendChild(errorMsg);
+        button.disabled = false;
+        button.innerText = originalText;
+        setTimeout(() => errorMsg.remove(), 3000);
+      }
+    });
+  </script>
+</body>
+</html>
