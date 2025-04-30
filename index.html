@@ -240,85 +240,38 @@
       });
     }, { threshold: 0.2 });
     document.querySelectorAll('[data-fade]').forEach(el => observer.observe(el));    // Handle form submission
-    document.querySelector('#formSection form').addEventListener('submit', async e => {
-      e.preventDefault();
-      const form = e.target;
-      const emailInput = form.email;
-      const email = emailInput.value.trim();
-
-      // Simple email validation
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        emailInput.classList.add('border-red-500');
-        const errorMsg = document.createElement('p');
-        errorMsg.className = 'text-red-500 text-sm mt-2';
-        errorMsg.textContent = 'Please enter a valid email address';
-        emailInput.parentNode.appendChild(errorMsg);
-        setTimeout(() => {
-          emailInput.classList.remove('border-red-500');
-          errorMsg.remove();
-        }, 3000);
-        return;
-      }
-
-      // Add loading state
-      const button = form.querySelector('button');
-      const originalText = button.innerText;
-      button.disabled = true;
-      button.innerHTML = '<span class="inline-flex items-center"><svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Joining...</span>';      try {
-        const response = await fetch('/.netlify/functions/subscribe', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email })
-        });
-
-        if (!response.ok) {
-          throw new Error('Subscription failed');
-        }
-
-        // Show success message
-        const successMsg = document.createElement('div');
-        successMsg.className = 'text-[#09c1ff] mt-4 flex items-center justify-center space-x-2';
-        successMsg.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><span>Thank you for joining our waitlist!</span>';
-        form.replaceWith(successMsg);
-      } catch (error) {
-        const errorMsg = document.createElement('p');
-        errorMsg.className = 'text-red-500 text-sm mt-2';
-        errorMsg.textContent = 'Something went wrong. Please try again.';
-        form.appendChild(errorMsg);
-        button.disabled = false;
-        button.innerText = originalText;
-        setTimeout(() => errorMsg.remove(), 3000);
-      }
-    });
-
-    // Additional form submission handling
     document.querySelector('form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = e.target.email.value;
+      const submitButton = e.target.querySelector('button[type="submit"]');
+      const originalButtonText = submitButton.innerText;
       
       try {
+        submitButton.innerText = 'Submitting...';
+        submitButton.disabled = true;
+        
         const response = await fetch('/.netlify/functions/subscribe', {
           method: 'POST',
-          body: JSON.stringify({ email }),
           headers: {
             'Content-Type': 'application/json'
-          }
+          },
+          body: JSON.stringify({ email })
         });
         
         const data = await response.json();
         
         if (response.ok) {
-          alert('Thanks for joining our waitlist!');
+          alert('Thanks for joining our waitlist! We\'ll be in touch soon.');
           e.target.reset();
         } else {
-          throw new Error(data.error || 'Something went wrong');
+          throw new Error(data.error || 'Something went wrong. Please try again.');
         }
       } catch (error) {
-        alert(error.message);
         console.error('Error:', error);
+        alert(error.message);
+      } finally {
+        submitButton.innerText = originalButtonText;
+        submitButton.disabled = false;
       }
     });
   </script>
