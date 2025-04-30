@@ -21,32 +21,73 @@ exports.handler = async (event, context) => {
     const KLAVIYO_API_KEY = process.env.KLAVIYO_API_KEY;
     const LIST_ID = process.env.KLAVIYO_LIST_ID;
     
-    const response = await fetch(`https://a.klaviyo.com/api/v2/list/${LIST_ID}/subscribe`, {
+    console.log('Creating profile for:', email); // Debug log
+    
+    // First create the profile
+    const createProfileResponse = await fetch('https://a.klaviyo.com/api/profiles/', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': `Klaviyo-API-Key ${KLAVIYO_API_KEY}`,
+        'revision': '2023-09-15'
       },
       body: JSON.stringify({
-        api_key: KLAVIYO_API_KEY,
-        profiles: [{
-          email: email
+        data: {
+          type: 'profile',
+          attributes: {
+            email: email,
+            subscribed: true
+          }
+        }
+      })
+    });
+
+    if (!createProfileResponse.ok) {
+      const errorText = await createProfileResponse.text();
+      console.error('Profile creation failed:', errorText);
+      throw new Error(`Failed to create profile in Klaviyo: ${errorText}`);
+    }
+
+    const profileData = await createProfileResponse.json();
+    const profileId = profileData.data.id;
+    
+    console.log('Profile created with ID:', profileId); // Debug log
+
+    // Now add the profile to the list
+    const addToListResponse = await fetch(`https://a.klaviyo.com/api/lists/${LIST_ID}/relationships/profiles/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': `Klaviyo-API-Key ${KLAVIYO_API_KEY}`,
+        'revision': '2023-09-15'
+      },
+      body: JSON.stringify({
+        data: [{
+          type: 'profile',
+          id: profileId
         }]
       })
     });
 
-    if (!response.ok) {
-      throw new Error('Failed to subscribe to Klaviyo');
+    if (!addToListResponse.ok) {
+      const errorText = await addToListResponse.text();
+      console.error('Adding to list failed:', errorText);
+      throw new Error(`Failed to add to Klaviyo list: ${errorText}`);
     }
+
+    console.log('Successfully added to list:', LIST_ID); // Debug log
 
     return {
       statusCode: 200,
       body: JSON.stringify({ message: 'Successfully subscribed to waitlist' })
     };
   } catch (error) {
-    console.error('Subscription error:', error);
+    console.error('Subscription error:', error.message);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Failed to subscribe to waitlist' })
+      body: JSON.stringify({ error: `Failed to subscribe to waitlist: ${error.message}` })
     };
   }
 };
