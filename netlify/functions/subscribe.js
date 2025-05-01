@@ -39,69 +39,50 @@ exports.handler = async (event, context) => {
     const apiKey = process.env.KLAVIYO_API_KEY;
     const listId = process.env.KLAVIYO_LIST_ID;
 
-    console.log('Starting subscription process:', {
+    console.log('Processing subscription:', {
       email,
       hasApiKey: !!apiKey,
-      keyLength: apiKey?.length,
-      listId,
-      timestamp: new Date().toISOString()
+      listId
     });
 
     if (!apiKey || !listId) {
       throw new Error('Missing required environment variables');
     }
 
-    // Add to Klaviyo list using v2 API
-    const subscribeUrl = `https://a.klaviyo.com/api/v2/list/${listId}/subscribe`;
-    console.log('Making request to:', subscribeUrl);
-
-    const requestBody = {
-      api_key: apiKey,
-      profiles: [{
-        email: email
-      }]
-    };
-
-    console.log('Request body:', JSON.stringify(requestBody));
-
-    const response = await fetch(subscribeUrl, {
+    // Add member to list using Klaviyo's API
+    const response = await fetch('https://a.klaviyo.com/api/v2/list/' + listId + '/members', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify(requestBody)
+      body: JSON.stringify({
+        api_key: apiKey,
+        profiles: [{
+          email: email
+        }]
+      })
     });
 
     const responseText = await response.text();
-    
-    console.log('Klaviyo API response:', {
+    console.log('Klaviyo response:', {
       status: response.status,
-      statusText: response.statusText,
-      headers: Object.fromEntries(response.headers),
-      body: responseText,
-      url: subscribeUrl
+      text: responseText
     });
 
     if (!response.ok) {
-      throw new Error(`Klaviyo API error (${response.status}): ${responseText}`);
+      throw new Error(`Failed to subscribe: ${responseText}`);
     }
 
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({ 
-        message: 'Successfully subscribed to waitlist',
-        email: email
+        message: 'Successfully subscribed to waitlist'
       })
     };
 
   } catch (error) {
-    console.error('Subscription error:', {
-      message: error.message,
-      stack: error.stack
-    });
-
+    console.error('Error:', error.message);
     return {
       statusCode: 500,
       headers,
