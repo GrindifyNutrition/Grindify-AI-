@@ -42,23 +42,25 @@ exports.handler = async (event, context) => {
     console.log('Processing subscription:', {
       email,
       hasApiKey: !!apiKey,
-      listId
+      keyLength: apiKey?.length,
+      listId,
+      timestamp: new Date().toISOString()
     });
 
     if (!apiKey || !listId) {
       throw new Error('Missing required environment variables');
     }
 
-    // Make Klaviyo API request using V2 endpoint
-    const subscribeUrl = `https://a.klaviyo.com/api/v2/list/${listId}/members`;
+    // Updated Klaviyo API call
+    const subscribeUrl = `https://a.klaviyo.com/api/v2/list/${listId}/subscribe`;
     const response = await fetch(subscribeUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': `Klaviyo-API-Key ${apiKey}`
+        'Accept': 'application/json'
       },
       body: JSON.stringify({
+        api_key: apiKey,
         profiles: [{
           email: email
         }]
@@ -69,7 +71,8 @@ exports.handler = async (event, context) => {
     console.log('Klaviyo API Response:', {
       status: response.status,
       text: responseText,
-      url: subscribeUrl
+      url: subscribeUrl,
+      timestamp: new Date().toISOString()
     });
 
     if (!response.ok) {
@@ -88,7 +91,8 @@ exports.handler = async (event, context) => {
   } catch (error) {
     console.error('Subscription error:', {
       message: error.message,
-      stack: error.stack
+      stack: error.stack,
+      timestamp: new Date().toISOString()
     });
 
     return {
