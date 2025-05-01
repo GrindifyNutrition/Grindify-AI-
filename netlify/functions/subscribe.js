@@ -1,6 +1,11 @@
 const fetch = require('node-fetch');
 
 exports.handler = async (event, context) => {
+  console.log('Function started', { 
+    httpMethod: event.httpMethod,
+    headers: event.headers 
+  });
+
   // Add CORS headers to handle preflight requests
   if (event.httpMethod === 'OPTIONS') {
     return {
@@ -27,10 +32,12 @@ exports.handler = async (event, context) => {
   }
 
   try {
+    console.log('Request body:', event.body);
     const { email } = JSON.parse(event.body);
 
     // Validate email
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      console.log('Invalid email:', email);
       return {
         statusCode: 400,
         headers: {
@@ -45,12 +52,14 @@ exports.handler = async (event, context) => {
     const KLAVIYO_API_KEY = process.env.KLAVIYO_API_KEY;
     const LIST_ID = process.env.KLAVIYO_LIST_ID;
 
+    console.log('Environment check:', { 
+      hasApiKey: !!KLAVIYO_API_KEY, 
+      hasListId: !!LIST_ID,
+      listId: LIST_ID
+    });
+
     if (!KLAVIYO_API_KEY || !LIST_ID) {
-      console.error('Missing environment variables:', { 
-        hasApiKey: !!KLAVIYO_API_KEY, 
-        hasListId: !!LIST_ID 
-      });
-      throw new Error('Configuration error');
+      throw new Error('Missing required environment variables');
     }
 
     console.log('Attempting to subscribe:', email);
@@ -69,13 +78,16 @@ exports.handler = async (event, context) => {
       })
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Subscription failed:', errorText);
-      throw new Error(`Failed to subscribe: ${errorText}`);
-    }
+    const responseText = await response.text();
+    console.log('Klaviyo response:', {
+      status: response.status,
+      ok: response.ok,
+      body: responseText
+    });
 
-    console.log('Successfully subscribed to list:', LIST_ID);
+    if (!response.ok) {
+      throw new Error(`Failed to subscribe: ${responseText}`);
+    }
 
     return {
       statusCode: 200,
@@ -89,7 +101,10 @@ exports.handler = async (event, context) => {
     };
 
   } catch (error) {
-    console.error('Subscription error:', error.message);
+    console.error('Subscription error:', {
+      message: error.message,
+      stack: error.stack
+    });
     
     return {
       statusCode: 500,
