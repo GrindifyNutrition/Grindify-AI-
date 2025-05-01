@@ -31,41 +31,23 @@ exports.handler = async (event, context) => {
     const KLAVIYO_API_KEY = process.env.KLAVIYO_API_KEY;
     const LIST_ID = process.env.KLAVIYO_LIST_ID;
 
-    // Log environment variables (safely)
-    console.log('Environment check:', {
+    console.log('Config check:', {
       hasKey: !!KLAVIYO_API_KEY,
       keyLength: KLAVIYO_API_KEY?.length,
-      listId: LIST_ID
+      listId: LIST_ID,
+      email: email
     });
 
     if (!KLAVIYO_API_KEY || !LIST_ID) {
       throw new Error('Missing required configuration');
     }
 
-    // First try to identify if the profile exists
-    const identifyResponse = await fetch('https://a.klaviyo.com/api/identify', {
+    // Use Klaviyo's Public API to add subscriber
+    const response = await fetch(`https://a.klaviyo.com/api/v2/list/${LIST_ID}/subscribe`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        token: KLAVIYO_API_KEY,
-        properties: {
-          email: email
-        }
-      })
-    });
-
-    if (!identifyResponse.ok) {
-      const identifyText = await identifyResponse.text();
-      console.error('Identify failed:', identifyText);
-    }
-
-    // Then subscribe to list
-    const subscribeResponse = await fetch(`https://a.klaviyo.com/api/v2/list/${LIST_ID}/subscribe`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
       },
       body: JSON.stringify({
         api_key: KLAVIYO_API_KEY,
@@ -75,14 +57,15 @@ exports.handler = async (event, context) => {
       })
     });
 
-    const subscribeText = await subscribeResponse.text();
-    console.log('Subscribe response:', {
-      status: subscribeResponse.status,
-      body: subscribeText
+    const responseText = await response.text();
+    console.log('Klaviyo response:', {
+      status: response.status,
+      body: responseText,
+      url: response.url
     });
 
-    if (!subscribeResponse.ok) {
-      throw new Error(`Subscription failed: ${subscribeText}`);
+    if (!response.ok) {
+      throw new Error(`Subscription failed: ${responseText}`);
     }
 
     return {
@@ -93,16 +76,12 @@ exports.handler = async (event, context) => {
       },
       body: JSON.stringify({ 
         message: 'Successfully subscribed to waitlist',
-        details: subscribeText
+        details: responseText
       })
     };
 
   } catch (error) {
-    console.error('Subscription error:', {
-      message: error.message,
-      stack: error.stack
-    });
-    
+    console.error('Error:', error);
     return {
       statusCode: 500,
       headers: {
