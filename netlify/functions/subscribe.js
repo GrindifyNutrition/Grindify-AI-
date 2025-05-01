@@ -47,6 +47,7 @@ exports.handler = async (event, context) => {
     console.log('Environment check:', {
       hasKey: !!KLAVIYO_API_KEY,
       keyLength: KLAVIYO_API_KEY?.length,
+      hasListId: !!LIST_ID,
       listId: LIST_ID,
       email: email
     });
@@ -55,41 +56,40 @@ exports.handler = async (event, context) => {
       throw new Error('Missing required environment variables');
     }
 
-    // Prepare Klaviyo API request
-    const subscribeUrl = `https://a.klaviyo.com/api/v2/list/${LIST_ID}/subscribe`;
-    const requestBody = {
-      api_key: KLAVIYO_API_KEY,
-      profiles: [{
-        email: email
-      }]
-    };
+    // Prepare and log Klaviyo API request
+    console.log('Making Klaviyo API request');
 
-    console.log('Making Klaviyo API request to:', subscribeUrl);
-
-    // Make API request
-    const response = await fetch(subscribeUrl, {
+    // Make API request to add subscriber to list
+    const response = await fetch(`https://a.klaviyo.com/api/v2/list/${LIST_ID}/subscribe`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'Cache-Control': 'no-cache'
       },
-      body: JSON.stringify(requestBody)
+      body: JSON.stringify({
+        api_key: KLAVIYO_API_KEY,
+        profiles: [{
+          email: email,
+          consent: true
+        }]
+      })
     });
 
+    // Get and log response
     const responseText = await response.text();
-    console.log('Klaviyo API response:', {
+    console.log('API Response:', {
       status: response.status,
       statusText: response.statusText,
-      headers: Object.fromEntries(response.headers),
       body: responseText
     });
 
-    // Handle API response
+    // Handle API errors
     if (!response.ok) {
       throw new Error(`Klaviyo API error: ${responseText}`);
     }
 
-    // Return success response
+    // Success response
     return {
       statusCode: 200,
       headers: {
@@ -104,14 +104,14 @@ exports.handler = async (event, context) => {
     };
 
   } catch (error) {
-    // Log detailed error information
-    console.error('Subscription error:', {
+    // Log error details
+    console.error('Error:', {
       message: error.message,
       stack: error.stack,
       type: error.constructor.name
     });
 
-    // Return error response
+    // Error response
     return {
       statusCode: 500,
       headers: {
