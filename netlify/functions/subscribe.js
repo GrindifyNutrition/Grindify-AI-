@@ -21,6 +21,7 @@ exports.handler = async (event, context) => {
   }
 
   try {
+    // Parse and validate request
     if (!event.body) {
       throw new Error('Missing request body');
     }
@@ -34,27 +35,28 @@ exports.handler = async (event, context) => {
       };
     }
 
+    // Get environment variables
     const apiKey = process.env.KLAVIYO_API_KEY;
     const listId = process.env.KLAVIYO_LIST_ID;
 
     console.log('Processing subscription:', {
       email,
-      hasKey: !!apiKey,
-      keyLength: apiKey?.length,
-      listId,
-      timestamp: new Date().toISOString()
+      hasApiKey: !!apiKey,
+      listId
     });
 
     if (!apiKey || !listId) {
       throw new Error('Missing required environment variables');
     }
 
-    // Add to Klaviyo list
-    const response = await fetch(`https://a.klaviyo.com/api/v2/list/${listId}/subscribe?api_key=${apiKey}`, {
+    // Make Klaviyo API request using V2 endpoint
+    const subscribeUrl = `https://a.klaviyo.com/api/v2/list/${listId}/members`;
+    const response = await fetch(subscribeUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'Authorization': `Klaviyo-API-Key ${apiKey}`
       },
       body: JSON.stringify({
         profiles: [{
@@ -64,14 +66,14 @@ exports.handler = async (event, context) => {
     });
 
     const responseText = await response.text();
-    console.log('Klaviyo response:', {
+    console.log('Klaviyo API Response:', {
       status: response.status,
       text: responseText,
-      endpoint: `/list/${listId}/subscribe`
+      url: subscribeUrl
     });
 
     if (!response.ok) {
-      throw new Error(`Klaviyo API error: ${responseText}`);
+      throw new Error(`Klaviyo API error (${response.status}): ${responseText}`);
     }
 
     return {
@@ -84,11 +86,9 @@ exports.handler = async (event, context) => {
     };
 
   } catch (error) {
-    console.error('Error details:', {
-      name: error.name,
+    console.error('Subscription error:', {
       message: error.message,
-      stack: error.stack,
-      timestamp: new Date().toISOString()
+      stack: error.stack
     });
 
     return {
