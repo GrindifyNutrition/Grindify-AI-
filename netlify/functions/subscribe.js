@@ -39,9 +39,10 @@ exports.handler = async (event, context) => {
     const apiKey = process.env.KLAVIYO_API_KEY;
     const listId = process.env.KLAVIYO_LIST_ID;
 
-    console.log('Processing subscription:', {
+    console.log('Starting subscription process:', {
       email,
       hasApiKey: !!apiKey,
+      keyLength: apiKey?.length,
       listId
     });
 
@@ -49,8 +50,9 @@ exports.handler = async (event, context) => {
       throw new Error('Missing required environment variables');
     }
 
-    // Add member to list using Klaviyo's API
-    const response = await fetch('https://a.klaviyo.com/api/v2/list/' + listId + '/members', {
+    // Add to Klaviyo list
+    const subscribeUrl = 'https://a.klaviyo.com/api/v2/list/' + listId + '/subscribe';
+    const response = await fetch(subscribeUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -58,7 +60,8 @@ exports.handler = async (event, context) => {
       body: JSON.stringify({
         api_key: apiKey,
         profiles: [{
-          email: email
+          email: email,
+          consent: true // Adding explicit consent
         }]
       })
     });
@@ -66,23 +69,33 @@ exports.handler = async (event, context) => {
     const responseText = await response.text();
     console.log('Klaviyo response:', {
       status: response.status,
-      text: responseText
+      text: responseText,
+      url: subscribeUrl
     });
 
+    // Check if the response was successful
     if (!response.ok) {
-      throw new Error(`Failed to subscribe: ${responseText}`);
+      throw new Error(`Klaviyo API error (${response.status}): ${responseText}`);
     }
 
+    // Return success response
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({ 
-        message: 'Successfully subscribed to waitlist'
+        message: 'Successfully subscribed to waitlist',
+        email: email
       })
     };
 
   } catch (error) {
-    console.error('Error:', error.message);
+    // Log the full error for debugging
+    console.error('Subscription error:', {
+      message: error.message,
+      stack: error.stack
+    });
+
+    // Return error response
     return {
       statusCode: 500,
       headers,
