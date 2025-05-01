@@ -39,7 +39,7 @@ exports.handler = async (event, context) => {
     const apiKey = process.env.KLAVIYO_API_KEY;
     const listId = process.env.KLAVIYO_LIST_ID;
 
-    console.log('Starting subscription:', {
+    console.log('Processing subscription:', {
       email,
       hasKey: !!apiKey,
       keyStart: apiKey?.substring(0, 4),
@@ -50,32 +50,30 @@ exports.handler = async (event, context) => {
       throw new Error('Missing required environment variables');
     }
 
-    // Updated Klaviyo API call
-    const response = await fetch(`https://a.klaviyo.com/api/v2/list/${listId}/members`, {
+    // Use the correct Klaviyo API endpoint and format
+    const response = await fetch('https://a.klaviyo.com/api/v2/list/' + listId + '/subscribe', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Klaviyo-API-Key': apiKey
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
+        api_key: apiKey,
         profiles: [{
-          email: email,
-          consent: true
+          email: email
         }]
       })
     });
 
     const responseText = await response.text();
-    console.log('API Response:', {
+    console.log('Klaviyo API response:', {
       status: response.status,
       text: responseText,
-      url: response.url
+      headers: Object.fromEntries(response.headers)
     });
 
     // Check if the response was successful
     if (!response.ok) {
-      throw new Error(`API error (${response.status}): ${responseText}`);
+      throw new Error(`Klaviyo API error (${response.status}): ${responseText}`);
     }
 
     // Return success response
@@ -90,7 +88,7 @@ exports.handler = async (event, context) => {
 
   } catch (error) {
     // Log the full error for debugging
-    console.error('Error details:', {
+    console.error('Subscription error:', {
       message: error.message,
       stack: error.stack
     });
