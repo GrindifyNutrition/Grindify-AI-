@@ -39,10 +39,10 @@ exports.handler = async (event, context) => {
     const apiKey = process.env.KLAVIYO_API_KEY;
     const listId = process.env.KLAVIYO_LIST_ID;
 
-    console.log('Processing subscription:', {
+    console.log('Starting subscription process:', {
       email,
       hasApiKey: !!apiKey,
-      apiKeyLength: apiKey?.length,
+      keyLength: apiKey?.length,
       listId,
       timestamp: new Date().toISOString()
     });
@@ -51,37 +51,48 @@ exports.handler = async (event, context) => {
       throw new Error('Missing required environment variables');
     }
 
-    // Add to Klaviyo list
+    // Add to Klaviyo list using v2 API
     const subscribeUrl = `https://a.klaviyo.com/api/v2/list/${listId}/subscribe`;
+    console.log('Making request to:', subscribeUrl);
+
+    const requestBody = {
+      api_key: apiKey,
+      profiles: [{
+        email: email
+      }]
+    };
+
+    console.log('Request body:', JSON.stringify(requestBody));
+
     const response = await fetch(subscribeUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Klaviyo-API-Key ${apiKey}`
+        'Accept': 'application/json'
       },
-      body: JSON.stringify({
-        profiles: [{
-          email: email
-        }]
-      })
+      body: JSON.stringify(requestBody)
     });
 
     const responseText = await response.text();
-    console.log('Klaviyo response:', {
+    
+    console.log('Klaviyo API response:', {
       status: response.status,
+      statusText: response.statusText,
+      headers: Object.fromEntries(response.headers),
       body: responseText,
       url: subscribeUrl
     });
 
     if (!response.ok) {
-      throw new Error(`Klaviyo API error: ${responseText}`);
+      throw new Error(`Klaviyo API error (${response.status}): ${responseText}`);
     }
 
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({ 
-        message: 'Successfully subscribed to waitlist'
+        message: 'Successfully subscribed to waitlist',
+        email: email
       })
     };
 
