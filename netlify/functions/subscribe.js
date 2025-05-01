@@ -1,18 +1,19 @@
 const fetch = require('node-fetch');
 
 exports.handler = async (event, context) => {
-  console.log('Function invoked with:', {
-    method: event.httpMethod,
-    contentType: event.headers['content-type']
-  });
+  // Add CORS headers
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Content-Type': 'application/json'
+  };
 
-  // Add CORS headers to handle preflight requests
+  // Handle preflight requests
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
       headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
+        ...headers,
         'Access-Control-Allow-Methods': 'POST, OPTIONS'
       },
       body: ''
@@ -20,105 +21,79 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    // Parse and validate request body
+    // Parse and validate request
     if (!event.body) {
       throw new Error('Missing request body');
     }
 
-    console.log('Request body:', event.body);
     const { email } = JSON.parse(event.body);
-
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return {
         statusCode: 400,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Headers': 'Content-Type',
-          'Content-Type': 'application/json'
-        },
+        headers,
         body: JSON.stringify({ error: 'Invalid email address' })
       };
     }
 
-    // Get and validate environment variables
-    const KLAVIYO_API_KEY = process.env.KLAVIYO_API_KEY;
-    const LIST_ID = process.env.KLAVIYO_LIST_ID;
+    // Get environment variables
+    const apiKey = process.env.KLAVIYO_API_KEY;
+    const listId = process.env.KLAVIYO_LIST_ID;
 
-    console.log('Environment check:', {
-      hasKey: !!KLAVIYO_API_KEY,
-      keyLength: KLAVIYO_API_KEY?.length,
-      hasListId: !!LIST_ID,
-      listId: LIST_ID,
-      email: email
+    console.log('Processing subscription:', {
+      email,
+      hasApiKey: !!apiKey,
+      apiKeyLength: apiKey?.length,
+      listId,
+      timestamp: new Date().toISOString()
     });
 
-    if (!KLAVIYO_API_KEY || !LIST_ID) {
+    if (!apiKey || !listId) {
       throw new Error('Missing required environment variables');
     }
 
-    // Prepare and log Klaviyo API request
-    console.log('Making Klaviyo API request');
-
-    // Make API request to add subscriber to list
-    const response = await fetch(`https://a.klaviyo.com/api/v2/list/${LIST_ID}/subscribe`, {
+    // Add to Klaviyo list
+    const subscribeUrl = `https://a.klaviyo.com/api/v2/list/${listId}/subscribe`;
+    const response = await fetch(subscribeUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Cache-Control': 'no-cache'
+        'Authorization': `Klaviyo-API-Key ${apiKey}`
       },
       body: JSON.stringify({
-        api_key: KLAVIYO_API_KEY,
         profiles: [{
-          email: email,
-          consent: true
+          email: email
         }]
       })
     });
 
-    // Get and log response
     const responseText = await response.text();
-    console.log('API Response:', {
+    console.log('Klaviyo response:', {
       status: response.status,
-      statusText: response.statusText,
-      body: responseText
+      body: responseText,
+      url: subscribeUrl
     });
 
-    // Handle API errors
     if (!response.ok) {
       throw new Error(`Klaviyo API error: ${responseText}`);
     }
 
-    // Success response
     return {
       statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Content-Type': 'application/json'
-      },
+      headers,
       body: JSON.stringify({ 
-        message: 'Successfully subscribed to waitlist',
-        details: responseText
+        message: 'Successfully subscribed to waitlist'
       })
     };
 
   } catch (error) {
-    // Log error details
-    console.error('Error:', {
+    console.error('Subscription error:', {
       message: error.message,
-      stack: error.stack,
-      type: error.constructor.name
+      stack: error.stack
     });
 
-    // Error response
     return {
       statusCode: 500,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Content-Type': 'application/json'
-      },
+      headers,
       body: JSON.stringify({ 
         error: 'Failed to subscribe to waitlist',
         details: error.message
