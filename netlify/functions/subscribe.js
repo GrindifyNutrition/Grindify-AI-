@@ -39,10 +39,10 @@ exports.handler = async (event, context) => {
     const apiKey = process.env.KLAVIYO_API_KEY;
     const listId = process.env.KLAVIYO_LIST_ID;
 
-    console.log('Starting subscription process:', {
+    console.log('Starting subscription:', {
       email,
-      hasApiKey: !!apiKey,
-      keyLength: apiKey?.length,
+      hasKey: !!apiKey,
+      keyStart: apiKey?.substring(0, 4),
       listId
     });
 
@@ -50,32 +50,32 @@ exports.handler = async (event, context) => {
       throw new Error('Missing required environment variables');
     }
 
-    // Add to Klaviyo list
-    const subscribeUrl = 'https://a.klaviyo.com/api/v2/list/' + listId + '/subscribe';
-    const response = await fetch(subscribeUrl, {
+    // Updated Klaviyo API call
+    const response = await fetch(`https://a.klaviyo.com/api/v2/list/${listId}/members`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Klaviyo-API-Key': apiKey
       },
       body: JSON.stringify({
-        api_key: apiKey,
         profiles: [{
           email: email,
-          consent: true // Adding explicit consent
+          consent: true
         }]
       })
     });
 
     const responseText = await response.text();
-    console.log('Klaviyo response:', {
+    console.log('API Response:', {
       status: response.status,
       text: responseText,
-      url: subscribeUrl
+      url: response.url
     });
 
     // Check if the response was successful
     if (!response.ok) {
-      throw new Error(`Klaviyo API error (${response.status}): ${responseText}`);
+      throw new Error(`API error (${response.status}): ${responseText}`);
     }
 
     // Return success response
@@ -90,7 +90,7 @@ exports.handler = async (event, context) => {
 
   } catch (error) {
     // Log the full error for debugging
-    console.error('Subscription error:', {
+    console.error('Error details:', {
       message: error.message,
       stack: error.stack
     });
