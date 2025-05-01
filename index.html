@@ -242,14 +242,19 @@
     document.querySelectorAll('[data-fade]').forEach(el => observer.observe(el));    // Handle form submission
     document.querySelector('form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const email = e.target.email.value;
+      
       const submitButton = e.target.querySelector('button[type="submit"]');
-      const originalButtonText = submitButton.innerText;
+      const originalText = submitButton.textContent;
       
       try {
-        submitButton.innerText = 'Submitting...';
+        // Update button state
+        submitButton.textContent = 'Submitting...';
         submitButton.disabled = true;
-        
+
+        // Get the email value
+        const email = e.target.querySelector('input[name="email"]').value;
+
+        // Submit to Netlify function
         const response = await fetch('/.netlify/functions/subscribe', {
           method: 'POST',
           headers: {
@@ -257,20 +262,22 @@
           },
           body: JSON.stringify({ email })
         });
-        
+
         const data = await response.json();
-        
-        if (response.ok) {
-          alert('Thanks for joining our waitlist! We\'ll be in touch soon.');
-          e.target.reset();
-        } else {
-          throw new Error(data.error || 'Failed to subscribe. Please try again.');
+
+        if (!response.ok) {
+          throw new Error(data.error || data.debug || 'Failed to subscribe');
         }
+
+        // Show success message
+        alert('Thanks for joining our waitlist! We\'ll be in touch soon.');
+        e.target.reset();
       } catch (error) {
-        console.error('Error:', error);
-        alert(error.message);
+        console.error('Submission error:', error);
+        alert(error.message || 'Something went wrong. Please try again.');
       } finally {
-        submitButton.innerText = originalButtonText;
+        // Reset button state
+        submitButton.textContent = originalText;
         submitButton.disabled = false;
       }
     });
