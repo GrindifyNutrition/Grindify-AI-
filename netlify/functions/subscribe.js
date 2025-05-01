@@ -37,13 +37,13 @@ exports.handler = async (event, context) => {
       listId: LIST_ID
     });
 
-    const response = await fetch(`https://a.klaviyo.com/api/v2/list/${LIST_ID}/members`, {
+    const response = await fetch(`https://a.klaviyo.com/api/v2/list/${LIST_ID}/subscribe`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Klaviyo-API-Key ${KLAVIYO_API_KEY}`
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
+        api_key: KLAVIYO_API_KEY,
         profiles: [{
           email: email
         }]
@@ -53,11 +53,12 @@ exports.handler = async (event, context) => {
     const responseText = await response.text();
     console.log('API Response:', {
       status: response.status,
-      body: responseText
+      body: responseText,
+      requestUrl: `https://a.klaviyo.com/api/v2/list/${LIST_ID}/subscribe`
     });
 
     if (!response.ok) {
-      throw new Error(responseText || 'Failed to subscribe');
+      throw new Error(`Failed to subscribe: ${responseText}`);
     }
 
     return {
@@ -70,7 +71,7 @@ exports.handler = async (event, context) => {
     };
 
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error:', error.message);
     return {
       statusCode: 500,
       headers: {
