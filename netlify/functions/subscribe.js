@@ -53,63 +53,29 @@ exports.handler = async (event, context) => {
       throw new Error('Configuration error');
     }
 
-    console.log('Attempting to create profile for:', email);
+    console.log('Attempting to subscribe:', email);
 
-    // Create profile in Klaviyo
-    const createProfileResponse = await fetch('https://a.klaviyo.com/api/profiles/', {
+    // Add to Klaviyo list
+    const response = await fetch(`https://a.klaviyo.com/api/v2/list/${LIST_ID}/subscribe`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': `Klaviyo-API-Key ${KLAVIYO_API_KEY}`,
-        'revision': '2023-09-15'
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        data: {
-          type: 'profile',
-          attributes: {
-            email: email,
-            subscribed: true
-          }
-        }
-      })
-    });
-
-    if (!createProfileResponse.ok) {
-      const errorText = await createProfileResponse.text();
-      console.error('Profile creation failed:', errorText);
-      throw new Error(`Failed to create profile: ${errorText}`);
-    }
-
-    const profileData = await createProfileResponse.json();
-    const profileId = profileData.data.id;
-
-    console.log('Profile created, ID:', profileId);
-
-    // Add profile to list
-    const addToListResponse = await fetch(`https://a.klaviyo.com/api/lists/${LIST_ID}/relationships/profiles/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': `Klaviyo-API-Key ${KLAVIYO_API_KEY}`,
-        'revision': '2023-09-15'
-      },
-      body: JSON.stringify({
-        data: [{
-          type: 'profile',
-          id: profileId
+        api_key: KLAVIYO_API_KEY,
+        profiles: [{
+          email: email
         }]
       })
     });
 
-    if (!addToListResponse.ok) {
-      const errorText = await addToListResponse.text();
-      console.error('Adding to list failed:', errorText);
-      throw new Error(`Failed to add to list: ${errorText}`);
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Subscription failed:', errorText);
+      throw new Error(`Failed to subscribe: ${errorText}`);
     }
 
-    console.log('Successfully added to list:', LIST_ID);
+    console.log('Successfully subscribed to list:', LIST_ID);
 
     return {
       statusCode: 200,
@@ -118,8 +84,7 @@ exports.handler = async (event, context) => {
         'Access-Control-Allow-Headers': 'Content-Type'
       },
       body: JSON.stringify({ 
-        message: 'Successfully subscribed to waitlist',
-        debug: { profileId, listId: LIST_ID }
+        message: 'Successfully subscribed to waitlist'
       })
     };
 
