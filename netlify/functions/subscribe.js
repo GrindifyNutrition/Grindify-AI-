@@ -21,6 +21,12 @@ exports.handler = async (event, context) => {
   }
 
   try {
+    console.log('Request received:', {
+      method: event.httpMethod,
+      headers: event.headers,
+      body: event.body
+    });
+
     // Parse and validate request
     if (!event.body) {
       throw new Error('Missing request body');
@@ -39,10 +45,9 @@ exports.handler = async (event, context) => {
     const apiKey = process.env.KLAVIYO_API_KEY;
     const listId = process.env.KLAVIYO_LIST_ID;
 
-    console.log('Processing subscription:', {
-      email,
+    console.log('Environment check:', {
       hasApiKey: !!apiKey,
-      keyLength: apiKey?.length,
+      apiKeyLength: apiKey?.length,
       listId,
       timestamp: new Date().toISOString()
     });
@@ -51,28 +56,35 @@ exports.handler = async (event, context) => {
       throw new Error('Missing required environment variables');
     }
 
-    // Updated Klaviyo API call
+    // Make Klaviyo API request
     const subscribeUrl = `https://a.klaviyo.com/api/v2/list/${listId}/subscribe`;
+    console.log('Making request to:', subscribeUrl);
+
+    const requestBody = {
+      api_key: apiKey,
+      profiles: [{
+        email: email
+      }]
+    };
+
+    console.log('Request payload:', JSON.stringify(requestBody, null, 2));
+
     const response = await fetch(subscribeUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
-      body: JSON.stringify({
-        api_key: apiKey,
-        profiles: [{
-          email: email
-        }]
-      })
+      body: JSON.stringify(requestBody)
     });
 
     const responseText = await response.text();
-    console.log('Klaviyo API Response:', {
+    console.log('Klaviyo response:', {
       status: response.status,
-      text: responseText,
-      url: subscribeUrl,
-      timestamp: new Date().toISOString()
+      statusText: response.statusText,
+      headers: Object.fromEntries(response.headers),
+      body: responseText,
+      url: subscribeUrl
     });
 
     if (!response.ok) {
@@ -89,7 +101,8 @@ exports.handler = async (event, context) => {
     };
 
   } catch (error) {
-    console.error('Subscription error:', {
+    console.error('Full error details:', {
+      name: error.name,
       message: error.message,
       stack: error.stack,
       timestamp: new Date().toISOString()
@@ -100,7 +113,8 @@ exports.handler = async (event, context) => {
       headers,
       body: JSON.stringify({ 
         error: 'Failed to subscribe to waitlist',
-        details: error.message
+        details: error.message,
+        timestamp: new Date().toISOString()
       })
     };
   }
