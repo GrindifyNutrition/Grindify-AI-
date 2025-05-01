@@ -31,13 +31,38 @@ exports.handler = async (event, context) => {
     const KLAVIYO_API_KEY = process.env.KLAVIYO_API_KEY;
     const LIST_ID = process.env.KLAVIYO_LIST_ID;
 
-    console.log('Config check:', {
+    // Log environment variables (safely)
+    console.log('Environment check:', {
       hasKey: !!KLAVIYO_API_KEY,
       keyLength: KLAVIYO_API_KEY?.length,
       listId: LIST_ID
     });
 
-    const response = await fetch(`https://a.klaviyo.com/api/v2/list/${LIST_ID}/subscribe`, {
+    if (!KLAVIYO_API_KEY || !LIST_ID) {
+      throw new Error('Missing required configuration');
+    }
+
+    // First try to identify if the profile exists
+    const identifyResponse = await fetch('https://a.klaviyo.com/api/identify', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        token: KLAVIYO_API_KEY,
+        properties: {
+          email: email
+        }
+      })
+    });
+
+    if (!identifyResponse.ok) {
+      const identifyText = await identifyResponse.text();
+      console.error('Identify failed:', identifyText);
+    }
+
+    // Then subscribe to list
+    const subscribeResponse = await fetch(`https://a.klaviyo.com/api/v2/list/${LIST_ID}/subscribe`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -50,15 +75,14 @@ exports.handler = async (event, context) => {
       })
     });
 
-    const responseText = await response.text();
-    console.log('API Response:', {
-      status: response.status,
-      body: responseText,
-      requestUrl: `https://a.klaviyo.com/api/v2/list/${LIST_ID}/subscribe`
+    const subscribeText = await subscribeResponse.text();
+    console.log('Subscribe response:', {
+      status: subscribeResponse.status,
+      body: subscribeText
     });
 
-    if (!response.ok) {
-      throw new Error(`Failed to subscribe: ${responseText}`);
+    if (!subscribeResponse.ok) {
+      throw new Error(`Subscription failed: ${subscribeText}`);
     }
 
     return {
@@ -67,11 +91,18 @@ exports.handler = async (event, context) => {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Content-Type'
       },
-      body: JSON.stringify({ message: 'Successfully subscribed to waitlist' })
+      body: JSON.stringify({ 
+        message: 'Successfully subscribed to waitlist',
+        details: subscribeText
+      })
     };
 
   } catch (error) {
-    console.error('Error:', error.message);
+    console.error('Subscription error:', {
+      message: error.message,
+      stack: error.stack
+    });
+    
     return {
       statusCode: 500,
       headers: {
