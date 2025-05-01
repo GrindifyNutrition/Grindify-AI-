@@ -264,7 +264,7 @@
           alert('Thanks for joining our waitlist! We\'ll be in touch soon.');
           e.target.reset();
         } else {
-          throw new Error(data.error || 'Something went wrong. Please try again.');
+          throw new Error(data.error || 'Failed to subscribe. Please try again.');
         }
       } catch (error) {
         console.error('Error:', error);
