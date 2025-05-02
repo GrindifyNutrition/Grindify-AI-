@@ -21,12 +21,6 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    console.log('Request received:', {
-      method: event.httpMethod,
-      headers: event.headers,
-      body: event.body
-    });
-
     // Parse and validate request
     if (!event.body) {
       throw new Error('Missing request body');
@@ -45,7 +39,8 @@ exports.handler = async (event, context) => {
     const apiKey = process.env.KLAVIYO_API_KEY;
     const listId = process.env.KLAVIYO_LIST_ID;
 
-    console.log('Environment check:', {
+    console.log('Processing subscription:', {
+      email,
       hasApiKey: !!apiKey,
       apiKeyLength: apiKey?.length,
       listId,
@@ -56,35 +51,29 @@ exports.handler = async (event, context) => {
       throw new Error('Missing required environment variables');
     }
 
-    // Make Klaviyo API request
-    const subscribeUrl = `https://a.klaviyo.com/api/v2/list/${listId}/subscribe`;
-    console.log('Making request to:', subscribeUrl);
-
-    const requestBody = {
-      api_key: apiKey,
-      profiles: [{
-        email: email
-      }]
-    };
-
-    console.log('Request payload:', JSON.stringify(requestBody, null, 2));
-
+    // Add to Klaviyo list using V2 API
+    const subscribeUrl = `https://a.klaviyo.com/api/v2/list/${listId}/members`;
     const response = await fetch(subscribeUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Authorization': `Klaviyo-API-Key ${apiKey}`
       },
-      body: JSON.stringify(requestBody)
+      body: JSON.stringify({
+        profiles: [{
+          email: email
+        }]
+      })
     });
 
     const responseText = await response.text();
-    console.log('Klaviyo response:', {
+    console.log('Klaviyo API Response:', {
       status: response.status,
       statusText: response.statusText,
       headers: Object.fromEntries(response.headers),
       body: responseText,
-      url: subscribeUrl
+      url: subscribeUrl,
+      timestamp: new Date().toISOString()
     });
 
     if (!response.ok) {
