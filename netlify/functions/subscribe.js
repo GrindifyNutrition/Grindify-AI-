@@ -1,109 +1,62 @@
 const fetch = require('node-fetch');
 
-exports.handler = async (event, context) => {
-  // Add CORS headers
+exports.handler = async (event) => {
+  // Basic CORS headers
   const headers = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
     'Content-Type': 'application/json'
   };
 
-  // Handle preflight requests
-  if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers: {
-        ...headers,
-        'Access-Control-Allow-Methods': 'POST, OPTIONS'
-      },
-      body: ''
-    };
-  }
-
   try {
-    // Parse and validate request
-    if (!event.body) {
-      throw new Error('Missing request body');
-    }
-
+    // Get the email from request body
     const { email } = JSON.parse(event.body);
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    
+    // Simple validation
+    if (!email) {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ error: 'Invalid email address' })
+        body: JSON.stringify({ error: 'Email is required' })
       };
     }
 
-    // Get environment variables
+    // Get Klaviyo credentials
     const apiKey = process.env.KLAVIYO_API_KEY;
     const listId = process.env.KLAVIYO_LIST_ID;
 
-    console.log('Processing subscription:', {
-      email,
-      hasApiKey: !!apiKey,
-      apiKeyLength: apiKey?.length,
-      listId,
-      timestamp: new Date().toISOString()
-    });
-
-    if (!apiKey || !listId) {
-      throw new Error('Missing required environment variables');
-    }
-
-    // Add to Klaviyo list using V2 API
-    const subscribeUrl = `https://a.klaviyo.com/api/v2/list/${listId}/members`;
-    const response = await fetch(subscribeUrl, {
+    // Add to Klaviyo list
+    const response = await fetch(`https://a.klaviyo.com/api/v2/list/${listId}/subscribe`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Klaviyo-API-Key ${apiKey}`
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        profiles: [{
-          email: email
-        }]
+        api_key: apiKey,
+        profiles: [{ email }]
       })
     });
 
-    const responseText = await response.text();
-    console.log('Klaviyo API Response:', {
-      status: response.status,
-      statusText: response.statusText,
-      headers: Object.fromEntries(response.headers),
-      body: responseText,
-      url: subscribeUrl,
-      timestamp: new Date().toISOString()
-    });
-
+    // Handle response
     if (!response.ok) {
-      throw new Error(`Klaviyo API error (${response.status}): ${responseText}`);
+      throw new Error('Failed to subscribe');
     }
 
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({ 
-        message: 'Successfully subscribed to waitlist',
-        email: email
+        success: true,
+        message: 'Subscribed successfully' 
       })
     };
 
   } catch (error) {
-    console.error('Full error details:', {
-      name: error.name,
-      message: error.message,
-      stack: error.stack,
-      timestamp: new Date().toISOString()
-    });
-
+    console.error('Subscription error:', error);
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({ 
-        error: 'Failed to subscribe to waitlist',
-        details: error.message,
-        timestamp: new Date().toISOString()
+        error: 'Subscription failed'
       })
     };
   }
