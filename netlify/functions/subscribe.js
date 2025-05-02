@@ -37,7 +37,7 @@ exports.handler = async (event) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'api-key': apiKey
+        'Authorization': `Klaviyo-API-Key ${apiKey}`
       },
       body: JSON.stringify({
         profiles: [{
