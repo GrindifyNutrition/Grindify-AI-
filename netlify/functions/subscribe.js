@@ -24,21 +24,36 @@ exports.handler = async (event) => {
     const apiKey = process.env.KLAVIYO_API_KEY;
     const listId = process.env.KLAVIYO_LIST_ID;
 
-    // Add to Klaviyo list
-    const response = await fetch(`https://a.klaviyo.com/api/v2/list/${listId}/subscribe`, {
+    if (!apiKey || !listId) {
+      console.error('Missing environment variables:', {
+        hasApiKey: !!apiKey,
+        hasListId: !!listId
+      });
+      throw new Error('Configuration error');
+    }
+
+    // Add to Klaviyo list - using V2 API format
+    const response = await fetch(`https://a.klaviyo.com/api/v2/list/${listId}/members`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'api-key': apiKey
       },
       body: JSON.stringify({
-        api_key: apiKey,
-        profiles: [{ email }]
+        profiles: [{
+          email: email
+        }]
       })
     });
 
-    // Handle response
+    const responseText = await response.text();
+    console.log('API Response:', {
+      status: response.status,
+      body: responseText
+    });
+
     if (!response.ok) {
-      throw new Error('Failed to subscribe');
+      throw new Error(`API Error: ${responseText}`);
     }
 
     return {
@@ -46,17 +61,19 @@ exports.handler = async (event) => {
       headers,
       body: JSON.stringify({ 
         success: true,
-        message: 'Subscribed successfully' 
+        message: 'Successfully subscribed!' 
       })
     };
 
   } catch (error) {
-    console.error('Subscription error:', error);
+    console.error('Error:', error.message);
+    
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({ 
-        error: 'Subscription failed'
+        error: 'Failed to subscribe',
+        details: error.message
       })
     };
   }
