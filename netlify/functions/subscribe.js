@@ -12,48 +12,45 @@ exports.handler = async (event) => {
     const { email } = JSON.parse(event.body);
     
     // Simple validation
-    if (!email) {
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ error: 'Email is required' })
+        body: JSON.stringify({ error: 'Invalid email address' })
       };
     }
 
-    // Get Klaviyo credentials
-    const apiKey = process.env.KLAVIYO_API_KEY;
-    const listId = process.env.KLAVIYO_LIST_ID;
-
-    if (!apiKey || !listId) {
-      console.error('Missing environment variables:', {
-        hasApiKey: !!apiKey,
-        hasListId: !!listId
-      });
-      throw new Error('Configuration error');
+    const zapierWebhookUrl = process.env.ZAPIER_WEBHOOK_URL;
+    
+    if (!zapierWebhookUrl) {
+      throw new Error('Missing Zapier webhook URL');
     }
 
-    // Add to Klaviyo list - using V2 API format
-    const response = await fetch(`https://a.klaviyo.com/api/v2/list/${listId}/members`, {
+    // Send data in the format Klaviyo expects
+    const response = await fetch(zapierWebhookUrl, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Klaviyo-API-Key ${apiKey}`
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        profiles: [{
-          email: email
-        }]
+        data: {
+          type: 'profile',
+          attributes: {
+            email: email,
+            subscriptions: {
+              email: true,
+              sms: false
+            }
+          }
+        },
+        timestamp: new Date().toISOString(),
+        source: 'landing_page'
       })
     });
 
-    const responseText = await response.text();
-    console.log('API Response:', {
-      status: response.status,
-      body: responseText
-    });
-
     if (!response.ok) {
-      throw new Error(`API Error: ${responseText}`);
+      console.error('Webhook response:', await response.text());
+      throw new Error('Failed to process subscription');
     }
 
     return {
@@ -66,8 +63,7 @@ exports.handler = async (event) => {
     };
 
   } catch (error) {
-    console.error('Error:', error.message);
-    
+    console.error('Subscription error:', error.message);
     return {
       statusCode: 500,
       headers,
