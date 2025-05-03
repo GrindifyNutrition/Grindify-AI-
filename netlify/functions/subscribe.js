@@ -26,30 +26,37 @@ exports.handler = async (event) => {
       throw new Error('Missing Zapier webhook URL');
     }
 
-    // Send data in the format Klaviyo expects
+    // Simplified payload with required subscriptions data
+    const requestBody = {
+      email: email,
+      subscriptions: {
+        email: true,
+        sms: false,
+        marketing: true,
+        transactional: true
+      },
+      timestamp: new Date().toISOString(),
+      source: 'landing_page'
+    };
+
+    console.log('Sending payload:', requestBody);
+
     const response = await fetch(zapierWebhookUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        data: {
-          type: 'profile',
-          attributes: {
-            email: email,
-            subscriptions: {
-              email: true,
-              sms: false
-            }
-          }
-        },
-        timestamp: new Date().toISOString(),
-        source: 'landing_page'
-      })
+      body: JSON.stringify(requestBody)
+    });
+
+    const responseText = await response.text();
+    console.log('Webhook response:', {
+      status: response.status,
+      body: responseText
     });
 
     if (!response.ok) {
-      console.error('Webhook response:', await response.text());
+      console.error('Webhook error:', responseText);
       throw new Error('Failed to process subscription');
     }
 
